@@ -8,7 +8,7 @@ class Field:
         return str(self.value)
 
 class Name(Field):
-    def __init__(self, value):
+    def __init__(self, value): 
         if not value:
             raise ValueError("Name cannot be empty.")
         super().__init__(value)
@@ -28,19 +28,18 @@ class Record:
         self.phones.append(Phone(phone_number))
 
     def remove_phone(self, phone_number):
-        phone_to_remove = None
-        for phone in self.phones:
-            if phone.value == phone_number:
-                phone_to_remove = phone
-                break
+        phone_to_remove = self.find_phone(phone_number)
         if phone_to_remove:
             self.phones.remove(phone_to_remove)
         else:
             raise ValueError(f"Phone number {phone_number} not found.")
 
     def edit_phone(self, old_phone, new_phone):
-        if old_phone not in [phone.value for phone in self.phones]:
+        old_phone_obj = self.find_phone(old_phone)
+        if not old_phone_obj:
             raise ValueError(f"Phone number {old_phone} not found.")
+        # Перевірка валідності нового номера перед видаленням старого
+        new_phone_obj = Phone(new_phone)  # Можливо викличе ValueError, якщо номер невалідний
         self.remove_phone(old_phone)
         self.add_phone(new_phone)
 
@@ -100,6 +99,13 @@ if __name__ == "__main__":
     # Пошук конкретного телефону у записі John
     found_phone = john.find_phone("5555555555")
     print(f"{john.name}: {found_phone}")  # Виведення: John: 5555555555
+
+    # Спроба замінити існуючий номер на невалідний
+    try:
+        john.edit_phone("5555555555", "invalid_phone")
+    except ValueError as e:
+        print("\nAttempt to replace with invalid phone:")
+        print(e)
 
     # Видалення запису Jane
     book.delete("Jane")

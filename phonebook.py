@@ -118,3 +118,18 @@ if __name__ == "__main__":
     
     print("\nAfter deleting Jane:")
     print(book)
+
+    '''def edit_phone(self, old_phone, new_phone):
+        old_phone_obj = self.find_phone(old_phone)
+        if not old_phone_obj:
+            raise ValueError(f"Phone number {old_phone} not found.")
+
+        # Перевірка валідності нового номера перед видаленням старого
+        try:
+            new_phone_obj = Phone(new_phone)  # Перевірка валідності нового номера
+        except ValueError as e:
+            raise ValueError(f"Cannot replace with invalid phone: {e}")
+
+        # Якщо новий номер валідний, видаляємо старий і додаємо новий
+        self.remove_phone(old_phone)
+        self.add_phone(new_phone)'''

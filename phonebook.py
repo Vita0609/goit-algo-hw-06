@@ -8,128 +8,90 @@ class Field:
         return str(self.value)
 
 class Name(Field):
-    def __init__(self, value): 
-        if not value:
-            raise ValueError("Name cannot be empty.")
-        super().__init__(value)
+
+    pass
 
 class Phone(Field):
     def __init__(self, value):
-        if not value.isdigit() or len(value) != 10:
-            raise ValueError("Phone number must contain exactly 10 digits.")
         super().__init__(value)
+        if len(value) != 10 or not value.isdigit():
+             raise ValueError("Номер повинен містити 10 цифр")
 
 class Record:
     def __init__(self, name):
         self.name = Name(name)
         self.phones = []
 
-    def add_phone(self, phone_number):
-        self.phones.append(Phone(phone_number))
+    def add_phone(self, number):
+        self.phones.append(Phone(number))
 
-    def remove_phone(self, phone_number):
-        phone_to_remove = self.find_phone(phone_number)
-        if phone_to_remove:
-            self.phones.remove(phone_to_remove)
-        else:
-            raise ValueError(f"Phone number {phone_number} not found.")
-
-    def edit_phone(self, old_phone, new_phone):
-        old_phone_obj = self.find_phone(old_phone)
-        if not old_phone_obj:
-            raise ValueError(f"Phone number {old_phone} not found.")
-
-        # Перевірка валідності нового номера перед видаленням старого
-        try:
-            new_phone_obj = Phone(new_phone)  # Перевірка валідності нового номера
-        except ValueError as e:
-            raise ValueError(f"Cannot replace with invalid phone: {e}")
-
-        # Якщо новий номер валідний, видаляємо старий і додаємо новий
-        self.remove_phone(old_phone)
-        self.add_phone(new_phone)
-
-    def find_phone(self, phone_number):
+    def remove_phone(self, remnum):
         for phone in self.phones:
-            if phone.value == phone_number:
-                return phone
+            if phone.value == remnum:
+                 self.phones.remove(phone)
+                 return print(f"Запис з номером '{remnum}' видалено.")
+        return print(f"Запис з номером '{remnum}' не знайдено.")
+
+    def edit_phone(self, oldnum, newnum):
+        if len(newnum) != 10 or not newnum.isdigit():
+            raise ValueError("Номер повинен містити 10 цифр")
+        else:
+            for phone in self.phones:
+                if phone.value == oldnum:
+                    phone.value = newnum
+                    return
+                raise ValueError(f"Номер '{oldnum}' не знайдено.")
+             
+
+    def find_phone(self, phone):
+        for el in self.phones:
+             if el.value == phone:
+                  return el
         return None
 
     def __str__(self):
-        phone_numbers = "; ".join([phone.value for phone in self.phones])
-        return f"Contact name: {self.name.value}, phones: {phone_numbers}"
+        phone_numbers = '; '.join(p.value for p in self.phones)
+        return f"{self.name}: {phone_numbers}"
 
 class AddressBook(UserDict):
     def add_record(self, record):
-        self.data[record.name.value] = record
-
-    def find(self, name):
-        return self.data.get(name, None)
-
-    def delete(self, name):
-        if name in self.data:
-            del self.data[name]
-
-    def __str__(self):
-        return "\n".join(str(record) for record in self.data.values())
-
-# Приклад використання
-if __name__ == "__main__":
-    # Створення нової адресної книги
-    book = AddressBook()
-
-    # Створення запису для John
-    john_record = Record("John")
-    john_record.add_phone("1234567890")
-    john_record.add_phone("5555555555")
-
-    # Додавання запису John до адресної книги
-    book.add_record(john_record)
-
-    # Створення та додавання нового запису для Jane
-    jane_record = Record("Jane")
-    jane_record.add_phone("9876543210")
-    book.add_record(jane_record)
-
-    # Виведення всіх записів у книзі
-    print("Address Book:")
-    print(book)
-
-    # Знаходження та редагування телефону для John
-    john = book.find("John")
-    john.edit_phone("1234567890", "1112223333")
-
-    print("\nAfter editing John's phone:")
-    print(john)  # Виведення: Contact name: John, phones: 1112223333; 5555555555
-
-    # Пошук конкретного телефону у записі John
-    found_phone = john.find_phone("5555555555")
-    print(f"{john.name}: {found_phone}")  # Виведення: John: 5555555555
-
-    # Спроба замінити існуючий номер на невалідний
-    try:
-        john.edit_phone("5555555555", "invalid_phone")
-    except ValueError as e:
-        print("\nAttempt to replace with invalid phone:")
-        print(e)
-
-    # Видалення запису Jane
-    book.delete("Jane")
+        key = record.name.value
+        self.data[key] = record
     
-    print("\nAfter deleting Jane:")
-    print(book)
+    def find(self, neededname):
+        return self.data.get(neededname)
 
-    '''def edit_phone(self, old_phone, new_phone):
-        old_phone_obj = self.find_phone(old_phone)
-        if not old_phone_obj:
-            raise ValueError(f"Phone number {old_phone} not found.")
+    def delete(self, rem):
+        if rem in self.data:
+            del self.data[rem]
+        else:
+            print(f"Запис з ім'ям '{rem}' не знайдено.")
+    
+    def __str__(self):
+        records = '\n'.join(f"{record}" for name, record in self.data.items())
+        return f"Address Book:\n{records}"
 
-        # Перевірка валідності нового номера перед видаленням старого
-        try:
-            new_phone_obj = Phone(new_phone)  # Перевірка валідності нового номера
-        except ValueError as e:
-            raise ValueError(f"Cannot replace with invalid phone: {e}")
 
-        # Якщо новий номер валідний, видаляємо старий і додаємо новий
-        self.remove_phone(old_phone)
-        self.add_phone(new_phone)'''
+book = AddressBook()
+
+john_record = Record("John")
+john_record.add_phone("1234567890")
+john_record.add_phone("5555555555")
+book.add_record(john_record)
+
+jane_record = Record("Jane")
+jane_record.add_phone("9876543210")
+book.add_record(jane_record)
+
+print(book)
+
+john = book.find("John")
+if john:
+    john.edit_phone("1234567890", "1112223333")
+    print(john)
+
+    found_phone = john.find_phone("5555555555")
+    print(f"{john.name.value}: {found_phone}")
+
+book.delete("Jane")
+print(book)
